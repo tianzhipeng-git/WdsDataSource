@@ -1,0 +1,11 @@
+target/
+.idea/
+.vscode/
+.classpath
+.project
+.idea.log
+WdsDataSourceV2.iml
+.sbt/repositories
+.metals/
+.bloop/
+.bsp/
