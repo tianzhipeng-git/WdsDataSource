@@ -10,6 +10,9 @@ import org.apache.spark.sql.execution.datasources.v2.FileTable
 import org.apache.spark.sql.types.StructType
 import org.apache.spark.sql.util.CaseInsensitiveStringMap
 import scala.collection.JavaConverters._
+import org.apache.spark.sql.types._
+import org.apache.spark.sql.connector.write.{LogicalWriteInfo, Write, WriteBuilder}
+import org.apache.spark.sql.execution.datasources.v2.wds.write.WdsWrite
 
 case class WdsTable(
                      name: String,
@@ -49,7 +52,25 @@ case class WdsTable(
   }
 
   override def newWriteBuilder(info: LogicalWriteInfo): WriteBuilder = {
-    // TODO: 实现写入逻辑
-    null
+    new WriteBuilder {
+      override def build(): Write = WdsWrite(paths, formatName, supportsDataType, info)
+    }
+  }
+
+  override def supportsDataType(dataType: DataType): Boolean = dataType match {
+    case _: AtomicType => true
+
+    case st: StructType => st.forall { f => supportsDataType(f.dataType) }
+
+    case ArrayType(elementType, _) => supportsDataType(elementType)
+
+    case MapType(keyType, valueType, _) =>
+      supportsDataType(keyType) && supportsDataType(valueType)
+
+    case udt: UserDefinedType[_] => supportsDataType(udt.sqlType)
+
+    case _: NullType => true
+
+    case _ => false
   }
 }

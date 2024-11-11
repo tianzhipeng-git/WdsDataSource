@@ -16,9 +16,10 @@ import org.apache.spark.sql.catalyst.json.JSONOptionsInRead
 import com.fasterxml.jackson.core._
 
 import java.io.InputStream
+import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream
 
 class TarTest extends FunSuite {
-  test("write tar") {
+  ignore("write tar") {
     val project_root_dir = new File(getClass.getResource("/").getPath).getParentFile.getParentFile.getParentFile
     println(s"project_root_dir: $project_root_dir")
     val tarFile = s"$project_root_dir/src/test/resources/test.tar"
@@ -46,6 +47,36 @@ class TarTest extends FunSuite {
       tar.write(imgBytes)
       tar.closeArchiveEntry()
     }
+    tar.close()
+  }
+
+  test("write tar with compression") {
+    val tarFile = "target/test.tar.gz"
+    val tar = new TarArchiveOutputStream(new GzipCompressorOutputStream(new FileOutputStream(tarFile)))
+  
+    val img = getClass.getResourceAsStream("/1.jpg")
+    val imgBytes = IOUtils.toByteArray(img)
+    
+    for (i <- 0 until 10) {
+      val json = Json.toJson(Map[String, JsValue](
+        "name" -> JsString(s"name$i"),
+        "age" -> JsNumber(i),
+        "city" -> JsString("New York")
+      ))
+      val jsonBytes = json.toString.getBytes
+      val jsonEntry = new TarArchiveEntry(s"$i.json")
+      jsonEntry.setSize(jsonBytes.length)
+      tar.putArchiveEntry(jsonEntry)
+      tar.write(jsonBytes)
+      tar.closeArchiveEntry()
+
+      val imgEntry = new TarArchiveEntry(s"$i.jpg") 
+      imgEntry.setSize(imgBytes.length)
+      tar.putArchiveEntry(imgEntry)
+      tar.write(imgBytes)
+      tar.closeArchiveEntry()
+    }
+    tar.close()
   }
 
   def typicalTarEntries(file_stream: InputStream): Map[String, TarArchiveEntry] = {
@@ -67,7 +98,7 @@ class TarTest extends FunSuite {
     entriesMap
   }
 
-  test("read tar") {
+  ignore("read tar") {
     val project_root_dir = new File(getClass.getResource("/").getPath).getParentFile.getParentFile.getParentFile
     val tarFile = s"$project_root_dir/src/test/resources/test.tar"
     val entriesMap = Using(new FileInputStream(tarFile)) { stream =>

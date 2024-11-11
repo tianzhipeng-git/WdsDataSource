@@ -16,7 +16,7 @@ import org.apache.spark.sql.execution.datasources.v2.FileScanBuilder
 import org.apache.spark.sql.execution.datasources.v2.FilePartitionReaderFactory
 import org.apache.spark.sql.catalyst.json.JSONOptionsInRead
 
-//TODO: 特性支持: filter pushdown, columnPruning/schema问题/partition, split, corrupt
+//TODO: 特性支持: filter pushdown, columnPruning/schema问题/partition, split, corrupt, 自定义的options
 //copy from CSVScan/JsonScan
 case class WdsScan (
     sparkSession: SparkSession,
