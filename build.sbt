@@ -12,9 +12,12 @@ lazy val root = (project in file("."))
     // 依赖项配置
     libraryDependencies ++= Seq(
       "org.scala-lang" % "scala-library" % scalaVersion.value,
-      "org.scalatest" %% "scalatest" % "3.0.8" % Test,
+      "org.scalatest" %% "scalatest" % "3.2.15" % Test,
       "org.apache.spark" %% "spark-core" % "3.3.2" % Provided,
-      "org.apache.spark" %% "spark-sql" % "3.3.2" % Provided
+      "org.apache.spark" %% "spark-sql" % "3.3.2" % Provided,
+      "org.apache.hadoop" % "hadoop-common" % "3.3.2" % Provided,
+      "org.apache.hadoop" % "hadoop-mapreduce-client-core" % "3.3.2" % Provided,
+      "com.typesafe.play" %% "play-json" % "2.9.2",
     ),
 
     // Java 和 Scala 编译选项
