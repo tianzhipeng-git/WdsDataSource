@@ -19,7 +19,7 @@ import java.io.InputStream
 import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream
 
 class TarTest extends FunSuite {
-  ignore("write tar") {
+  test("write tar") {
     val project_root_dir = new File(getClass.getResource("/").getPath).getParentFile.getParentFile.getParentFile
     println(s"project_root_dir: $project_root_dir")
     val tarFile = s"$project_root_dir/src/test/resources/test.tar"
@@ -98,7 +98,7 @@ class TarTest extends FunSuite {
     entriesMap
   }
 
-  ignore("read tar") {
+  test("read tar") {
     val project_root_dir = new File(getClass.getResource("/").getPath).getParentFile.getParentFile.getParentFile
     val tarFile = s"$project_root_dir/src/test/resources/test.tar"
     val entriesMap = Using(new FileInputStream(tarFile)) { stream =>

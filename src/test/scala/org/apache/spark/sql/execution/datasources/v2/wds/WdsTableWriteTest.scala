@@ -15,9 +15,10 @@ import org.apache.commons.io.IOUtils
 import java.io.FileInputStream
 import org.json4s.jackson.JsonMethods.parse
 import org.apache.spark.sql.SparkSession
-
+import org.apache.spark.sql.catalyst.util.CaseInsensitiveMap
 import scala.io.Source
 import org.apache.spark.unsafe.types.UTF8String
+import org.apache.commons.io.FileUtils
 
 class WdsOutputWriterTest extends FunSuite {
   val spark = SparkSession.builder()
@@ -36,8 +37,8 @@ class WdsOutputWriterTest extends FunSuite {
       StructField("photo", BinaryType)
     ))
     
-    val options = new JSONOptions(
-      Map("wds_keyfield" -> "key"),
+    val options = new WdsOptions(
+      CaseInsensitiveMap(Map("wds_keyfield" -> "key")),
       "UTC",
       "_corrupt_record"
     )
@@ -47,7 +48,7 @@ class WdsOutputWriterTest extends FunSuite {
     val context = new TaskAttemptContextImpl(conf, new TaskAttemptID())
     val outputPath = "target/" + context.getTaskAttemptID.toString + ".tar"
     //rm if exists
-    new File(outputPath).delete()
+    FileUtils.deleteDirectory(new File(outputPath))
     
     // 创建writer并写入数据
     val writer = new WdsOutputWriter(outputPath, options, schema, context)
@@ -94,17 +95,19 @@ class WdsOutputWriterTest extends FunSuite {
   }
 
   test("use datasource api to write tar") {
+    val outputPath = "target/test1"
+    FileUtils.deleteDirectory(new File(outputPath))
     //generate df 100 rows
     val img = getClass.getResourceAsStream("/1.jpg")
     val imgBytes = IOUtils.toByteArray(img)
     val df = spark.range(100).map(i => {
       (i.toString, s"name$i", i, imgBytes)
-    }).toDF("key", "name", "age", "photo")
+    }).toDF("key", "name", "age", "jpg")
 
     df.show()
 
-    df.write.format("org.apache.spark.sql.execution.datasources.v2.wds.WdsDataSource")
+    df.repartition(5).write.format("wds")
       .option("wds_keyfield", "key")
-      .save("target/test1")
+      .save(outputPath)
   }
 } 

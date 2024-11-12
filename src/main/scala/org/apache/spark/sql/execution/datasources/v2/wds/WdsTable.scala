@@ -33,16 +33,8 @@ case class WdsTable(
   override def inferSchema(
                             files: Seq[FileStatus]
                           ): Option[StructType] = {
-    val file: FileStatus = files.find(f => f.getPath.toString.endsWith(".tar") || f.getPath.toString.endsWith(".tar.gz"))
-      .getOrElse(throw new IllegalArgumentException("没有找到.tar或.tar.gz文件"))
-
     val caseSensitiveMap = options.asCaseSensitiveMap.asScala.toMap
-    val hadoopConf = sparkSession.sessionState.newHadoopConfWithOptions(caseSensitiveMap)
-    val fs = file.getPath().getFileSystem(hadoopConf)
-    Using(fs.open(file.getPath)) { stream =>
-      val schema = Utils.inferSchema(stream, sparkSession)
-      Some(schema)
-    }
+    Utils.inferSchema(sparkSession, caseSensitiveMap, files)
   }
 
   override def newScanBuilder(

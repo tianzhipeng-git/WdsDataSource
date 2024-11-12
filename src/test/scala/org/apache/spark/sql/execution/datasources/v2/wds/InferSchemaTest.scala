@@ -25,7 +25,9 @@ class InferSchemaTest extends FunSuite {
   import spark.implicits._
 
   test("read tar") {
-    val tarFile = "target/test.tar"
+    val project_root_dir = new File(getClass.getResource("/").getPath).getParentFile.getParentFile.getParentFile
+    println(s"project_root_dir: $project_root_dir")
+    val tarFile = s"$project_root_dir/src/test/resources/test.tar"
     //check file exists
     assert(new File(tarFile).exists(), s"文件 $tarFile 不存在")
     val tar = new FileInputStream(tarFile)

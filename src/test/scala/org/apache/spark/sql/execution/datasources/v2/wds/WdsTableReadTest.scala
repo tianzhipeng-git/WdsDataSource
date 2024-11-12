@@ -29,6 +29,7 @@ import org.apache.commons.codec.digest.DigestUtils
 
 class WdsTableReadTest extends FunSuite {
   val spark = SparkSession.builder()
+    .config("spark.sql.files.maxPartitionBytes", 1)
     .master("local")
     .getOrCreate()
   val sc = spark.sparkContext
@@ -36,7 +37,7 @@ class WdsTableReadTest extends FunSuite {
   import spark.implicits._
 
   val project_root_dir = new File(getClass.getResource("/").getPath).getParentFile.getParentFile.getParentFile
-    val tarFile = s"$project_root_dir/src/test/resources/test.tar"
+  val tarFile = s"$project_root_dir/src/test/resources/test.tar"
 
   ignore("test extra schema") {
     val schema = StructType(Seq(
@@ -115,10 +116,20 @@ class WdsTableReadTest extends FunSuite {
     
   }
 
-  test("use datasource api to read tar") {
-    //use spark dataframe api to read tar
+  ignore("use datasource api to read tar") {
     val df = spark.read.format("org.apache.spark.sql.execution.datasources.v2.wds.WdsDataSource").load(tarFile)
     df.printSchema()
     df.show()
+    print(df.count())
+    print(df.rdd.partitions)
+  }
+
+  test("use datasource api to read tar v1") {
+    val tarFile = "target/test1"
+    val df = spark.read.format("wds").load(tarFile)
+    df.printSchema()
+    df.show()
+    println(s"count: ${df.count()}")
+    println(s"partitions: ${df.rdd.partitions.length}")
   }
 } 

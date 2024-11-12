@@ -5,10 +5,11 @@ import org.apache.spark.sql.execution.datasources._
 import org.apache.spark.sql.execution.datasources.v2._
 import org.apache.spark.sql.types.StructType
 import org.apache.spark.sql.util.CaseInsensitiveStringMap
+import org.apache.spark.sql.execution.datasources.wds.WdsFileFormat
 
 
 class WdsDataSource extends FileDataSourceV2 {
-  override def fallbackFileFormat: Class[_ <: FileFormat] = null;
+  override def fallbackFileFormat: Class[_ <: FileFormat] = classOf[WdsFileFormat];
   
   override def shortName(): String = "wds"
   
@@ -16,7 +17,7 @@ class WdsDataSource extends FileDataSourceV2 {
     val paths = getPaths(options)
     val tableName = getTableName(options, paths)
     val optionsWithoutPaths = getOptionsWithoutPaths(options)
-    wds.WdsTable(tableName, sparkSession, optionsWithoutPaths, paths, None)
+    WdsTable(tableName, sparkSession, optionsWithoutPaths, paths, None)
   }
 
 
@@ -24,7 +25,7 @@ class WdsDataSource extends FileDataSourceV2 {
     val paths = getPaths(options)
     val tableName = getTableName(options, paths)
     val optionsWithoutPaths = getOptionsWithoutPaths(options)
-    wds.WdsTable(
+    WdsTable(
       tableName, sparkSession, optionsWithoutPaths, paths, Some(schema))
   }
 }

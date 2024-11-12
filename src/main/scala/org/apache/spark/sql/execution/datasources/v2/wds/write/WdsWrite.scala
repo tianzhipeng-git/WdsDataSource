@@ -10,7 +10,6 @@ import org.apache.spark.sql.catalyst.expressions.Attribute
 import org.apache.spark.sql.catalyst.expressions.AttributeReference
 import org.apache.spark.sql.execution.datasources.{CodecStreams, OutputWriter, OutputWriterFactory}
 import org.apache.hadoop.mapreduce.TaskAttemptContext
-import org.apache.spark.sql.catalyst.json.JSONOptions
 import org.apache.spark.sql.catalyst.util.CompressionCodecs
 import org.apache.spark.internal.Logging
 import java.nio.charset.{Charset, StandardCharsets}
@@ -21,6 +20,8 @@ import org.apache.hadoop.io.compress.CompressionCodecFactory
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry
 import org.apache.spark.sql.catalyst.expressions.GenericInternalRow
+import org.apache.spark.sql.execution.datasources.v2.wds.WdsOptions
+import org.apache.spark.sql.catalyst.util.CaseInsensitiveMap
 
 case class WdsWrite(
     paths: Seq[String],
@@ -30,11 +31,11 @@ case class WdsWrite(
 
     override def prepareWrite(sqlConf: SQLConf, job: Job, options: Map[String, String], dataSchema: StructType): OutputWriterFactory = {
         val conf = job.getConfiguration
-        val jsonOptions = new JSONOptions(
-            options,
+        val wdsOptions = new WdsOptions(
+            CaseInsensitiveMap(options),
             sqlConf.sessionLocalTimeZone,
             sqlConf.columnNameOfCorruptRecord)
-        jsonOptions.compressionCodec.foreach { codec =>
+        wdsOptions.compressionCodec.foreach { codec =>
             CompressionCodecs.setCodecConfiguration(conf, codec)
         }
         new OutputWriterFactory {
@@ -43,7 +44,7 @@ case class WdsWrite(
             }
 
             override def newInstance(path: String, dataSchema: StructType, context: TaskAttemptContext): OutputWriter = {
-                new WdsOutputWriter(path, jsonOptions, dataSchema, context)
+                new WdsOutputWriter(path, wdsOptions, dataSchema, context)
             }
         }
     }
@@ -51,7 +52,7 @@ case class WdsWrite(
 
 class WdsOutputWriter(
     val path: String,
-    options: JSONOptions,
+    options: WdsOptions,
     dataSchema: StructType,
     context: TaskAttemptContext) extends OutputWriter with Logging {
 
@@ -73,8 +74,7 @@ class WdsOutputWriter(
         new TarArchiveOutputStream(codecStream)
     }
 
-    private val keyField = options.parameters.get("wds_keyfield")
-    private val keyFieldIndex = dataSchema.getFieldIndex(keyField.get).get
+    private val keyFieldIndex = dataSchema.getFieldIndex(options.keyField).get
     private val binaryFields = dataSchema.filter(_.dataType == BinaryType)
 
     private val jsonFields = dataSchema.filter(_.dataType != BinaryType)

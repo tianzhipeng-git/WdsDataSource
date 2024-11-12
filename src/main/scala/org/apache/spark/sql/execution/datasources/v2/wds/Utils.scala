@@ -4,8 +4,11 @@ import org.apache.commons.compress.archivers.tar.{TarArchiveEntry, TarArchiveInp
 import org.apache.commons.io.IOUtils
 import org.apache.spark.sql.types.{BinaryType, StructField, StructType}
 import org.apache.spark.sql.{Encoders, SparkSession}
-
+import org.apache.hadoop.fs.FileStatus
+import scala.collection.JavaConverters._
 import java.io._
+import org.apache.spark.sql.catalyst.json.JSONOptions
+import org.apache.spark.sql.catalyst.util._
 
 object Using {
   def apply[A <: Closeable, B](resource: A)(block: A => B): B = {
@@ -71,4 +74,30 @@ object Utils {
     }
     schema
   }
+
+  def inferSchema(sparkSession: SparkSession,
+      options: Map[String, String],
+      files: Seq[FileStatus]): Option[StructType] = {
+    val file: FileStatus = files.find(f => f.getPath.toString.endsWith(".tar") || f.getPath.toString.endsWith(".tar.gz"))
+      .getOrElse(throw new IllegalArgumentException("没有找到.tar或.tar.gz文件"))
+    val hadoopConf = sparkSession.sessionState.newHadoopConfWithOptions(options)
+    val fs = file.getPath().getFileSystem(hadoopConf)
+    Using(fs.open(file.getPath)) { stream =>
+      val schema = Utils.inferSchema(stream, sparkSession)
+      Some(schema)
+    }
+  }
+}
+
+class WdsOptions(
+    @transient override val parameters: CaseInsensitiveMap[String],
+    defaultTimeZoneId: String = "UTC",
+    defaultColumnNameOfCorruptRecord: String = "__corrupt_record__"
+) extends JSONOptions(
+    parameters,
+    defaultTimeZoneId,
+    defaultColumnNameOfCorruptRecord
+) {
+  val keyField =
+    parameters.get("wds_keyfield").map(_.toString).getOrElse("key")
 }

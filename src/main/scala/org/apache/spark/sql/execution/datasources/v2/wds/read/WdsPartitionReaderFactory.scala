@@ -37,7 +37,7 @@ case class WdsPartitionReaderFactory(
     parsedOptions: JSONOptions,
     filters: Seq[Filter]) extends FilePartitionReaderFactory {
 
-    override def buildReader(file: PartitionedFile): PartitionReader[InternalRow] = {
+    def buildIterator(file: PartitionedFile): Iterator[InternalRow] = {
         val conf = broadcastedConf.value.value
         val stream = CodecStreams.createInputStreamWithCloseResource(conf, new Path(file.filePath))
 
@@ -84,6 +84,11 @@ case class WdsPartitionReaderFactory(
                 row
             }
         }
+        iter
+    }
+
+    override def buildReader(file: PartitionedFile): PartitionReader[InternalRow] = {
+        val iter = buildIterator(file)
         val fileReader = new PartitionReaderFromIterator[InternalRow](iter)
         new PartitionReaderWithPartitionValues(fileReader, readDataSchema,
         partitionSchema, file.partitionValues)
