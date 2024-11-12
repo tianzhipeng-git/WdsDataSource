@@ -1,15 +1,13 @@
 package org.apache.spark.sql.execution.datasources.v2.wds
 
-import org.apache.spark.sql.catalyst.json.JacksonParser
-import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.expressions.GenericInternalRow
-import org.apache.spark.sql.types._
-import org.scalatest.FunSuite
-import org.apache.spark.sql.catalyst.json.JSONOptionsInRead
+import org.apache.spark.sql.catalyst.json.{JSONOptionsInRead, JacksonParser}
 import org.apache.spark.sql.catalyst.util.CaseInsensitiveMap
+import org.apache.spark.sql.types._
 import org.apache.spark.unsafe.types.UTF8String
+import org.scalatest.funsuite.AnyFunSuite
 
-class JsonConvertTest extends FunSuite {
+class JsonConvertTest extends AnyFunSuite {
   ignore("test") {
     val jsonString = "{\"name\": \"John\", \"age\": 30, \"city\": \"New York\"}"
     val schema = StructType(

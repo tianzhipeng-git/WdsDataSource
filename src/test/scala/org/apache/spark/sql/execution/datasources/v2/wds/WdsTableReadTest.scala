@@ -1,40 +1,27 @@
 package org.apache.spark.sql.execution.datasources.v2.wds
 
+import org.apache.commons.codec.digest.DigestUtils
+import org.apache.hadoop.fs.Path
 import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.catalyst.InternalRow
+import org.apache.spark.sql.catalyst.expressions.GenericRowWithSchema
+import org.apache.spark.sql.catalyst.json.{JSONOptionsInRead, JacksonParser}
+import org.apache.spark.sql.catalyst.util.CaseInsensitiveMap
+import org.apache.spark.sql.execution.datasources.{CodecStreams, PartitionedFile}
+import org.apache.spark.sql.execution.datasources.v2.wds.read.WdsScan
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.util.CaseInsensitiveStringMap
-import org.scalatest.FunSuite
+import org.scalatest.funsuite.AnyFunSuite
 
-import java.util.Collections
 import java.io.File
-import org.apache.spark.sql.execution.datasources.v2.wds.read.WdsScan
-import org.apache.spark.sql.execution.datasources.v2.FilePartitionReaderFactory
-import org.apache.spark.sql.execution.datasources.PartitionedFile
-import org.apache.spark.sql.catalyst.InternalRow
-import org.apache.spark.sql.catalyst.json.JacksonParser
-import org.apache.spark.sql.catalyst.InternalRow
-import org.apache.spark.sql.catalyst.expressions.GenericInternalRow
-import org.apache.spark.sql.types._
-import org.scalatest.FunSuite
-import org.apache.spark.sql.catalyst.json.JSONOptionsInRead
-import org.apache.spark.sql.catalyst.util.CaseInsensitiveMap
-import org.apache.spark.unsafe.types.UTF8String
-import org.apache.hadoop.fs.Path
-import org.apache.spark.sql.execution.datasources.CodecStreams
-import org.apache.commons.compress.archivers.tar.TarArchiveInputStream
-import org.apache.hadoop.fs.FileSystem
-import org.apache.spark.TaskContext
-import org.apache.spark.sql.catalyst.expressions.GenericRowWithSchema
-import org.apache.commons.codec.digest.DigestUtils
+import java.util.Collections
 
-class WdsTableReadTest extends FunSuite {
+class WdsTableReadTest extends AnyFunSuite {
   val spark = SparkSession.builder()
     .config("spark.sql.files.maxPartitionBytes", 1)
     .master("local")
     .getOrCreate()
   val sc = spark.sparkContext
-
-  import spark.implicits._
 
   val project_root_dir = new File(getClass.getResource("/").getPath).getParentFile.getParentFile.getParentFile
   val tarFile = s"$project_root_dir/src/test/resources/test.tar"
@@ -125,7 +112,7 @@ class WdsTableReadTest extends FunSuite {
   }
 
   test("use datasource api to read tar v1") {
-    val tarFile = "target/test1"
+//    val tarFile = "target/test1"
     val df = spark.read.format("wds").load(tarFile)
     df.printSchema()
     df.show()

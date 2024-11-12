@@ -2,13 +2,13 @@ package org.apache.spark.sql.execution.datasources.v2.wds
 
 import org.apache.commons.compress.archivers.tar.{TarArchiveEntry, TarArchiveInputStream}
 import org.apache.commons.io.IOUtils
-import org.apache.spark.sql.types.{BinaryType, StructField, StructType}
-import org.apache.spark.sql.{Encoders, SparkSession}
 import org.apache.hadoop.fs.FileStatus
-import scala.collection.JavaConverters._
-import java.io._
 import org.apache.spark.sql.catalyst.json.JSONOptions
 import org.apache.spark.sql.catalyst.util._
+import org.apache.spark.sql.types.{BinaryType, StructField, StructType}
+import org.apache.spark.sql.{Encoders, SparkSession}
+
+import java.io._
 
 object Using {
   def apply[A <: Closeable, B](resource: A)(block: A => B): B = {

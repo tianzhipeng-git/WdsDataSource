@@ -1,27 +1,23 @@
 package org.apache.spark.sql.execution.datasources.v2.wds.write
 
-import org.apache.spark.sql.connector.write.{LogicalWriteInfo, Write, WriteBuilder}
-import org.apache.spark.sql.types._
-import org.apache.spark.sql.execution.datasources.v2.FileWrite
-import org.apache.spark.sql.internal.SQLConf
-import org.apache.hadoop.mapreduce.Job
-import org.apache.spark.sql.catalyst.InternalRow
-import org.apache.spark.sql.catalyst.expressions.Attribute
-import org.apache.spark.sql.catalyst.expressions.AttributeReference
-import org.apache.spark.sql.execution.datasources.{CodecStreams, OutputWriter, OutputWriterFactory}
-import org.apache.hadoop.mapreduce.TaskAttemptContext
-import org.apache.spark.sql.catalyst.util.CompressionCodecs
-import org.apache.spark.internal.Logging
-import java.nio.charset.{Charset, StandardCharsets}
+import org.apache.commons.compress.archivers.tar.{TarArchiveEntry, TarArchiveOutputStream}
 import org.apache.hadoop.fs.Path
-import org.apache.spark.sql.catalyst.json.JacksonGenerator
-import java.io.{ByteArrayOutputStream, OutputStreamWriter, OutputStream}
 import org.apache.hadoop.io.compress.CompressionCodecFactory
-import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream
-import org.apache.commons.compress.archivers.tar.TarArchiveEntry
+import org.apache.hadoop.mapreduce.{Job, TaskAttemptContext}
+import org.apache.spark.internal.Logging
+import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.expressions.GenericInternalRow
+import org.apache.spark.sql.catalyst.json.JacksonGenerator
+import org.apache.spark.sql.catalyst.util.{CaseInsensitiveMap, CompressionCodecs}
+import org.apache.spark.sql.connector.write.LogicalWriteInfo
+import org.apache.spark.sql.execution.datasources.v2.FileWrite
 import org.apache.spark.sql.execution.datasources.v2.wds.WdsOptions
-import org.apache.spark.sql.catalyst.util.CaseInsensitiveMap
+import org.apache.spark.sql.execution.datasources.{CodecStreams, OutputWriter, OutputWriterFactory}
+import org.apache.spark.sql.internal.SQLConf
+import org.apache.spark.sql.types._
+
+import java.io.{ByteArrayOutputStream, OutputStream, OutputStreamWriter}
+import java.nio.charset.{Charset, StandardCharsets}
 
 case class WdsWrite(
     paths: Seq[String],

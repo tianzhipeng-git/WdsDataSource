@@ -7,17 +7,18 @@ Compile / packageBin := (Compile / packageBin).dependsOn(assembly).value
 
 lazy val root = (project in file("."))
   .settings(
-    name := "WdsDataSourceV2",
+    name := "WdsDataSource",
     
     // 依赖项配置
     libraryDependencies ++= Seq(
       "org.scala-lang" % "scala-library" % scalaVersion.value,
       "org.scalatest" %% "scalatest" % "3.2.15" % Test,
+      "org.scalatest" %% "scalatest-funsuite" % "3.2.15" % Test,
       "org.apache.spark" %% "spark-core" % "3.3.2" % Provided,
       "org.apache.spark" %% "spark-sql" % "3.3.2" % Provided,
       "org.apache.hadoop" % "hadoop-common" % "3.3.2" % Provided,
       "org.apache.hadoop" % "hadoop-mapreduce-client-core" % "3.3.2" % Provided,
-      "com.typesafe.play" %% "play-json" % "2.9.2",
+      "com.typesafe.play" %% "play-json" % "2.9.2" % Test,
     ),
 
     // Java 和 Scala 编译选项

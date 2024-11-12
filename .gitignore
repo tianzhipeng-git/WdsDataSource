@@ -4,7 +4,7 @@ target/
 .classpath
 .project
 .idea.log
-WdsDataSourceV2.iml
+*.iml
 .sbt/repositories
 .metals/
 .bloop/

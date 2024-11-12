@@ -1,20 +1,18 @@
 package org.apache.spark.sql.execution.datasources.v2.wds.read
 
-import org.apache.spark.sql.catalyst.StructFilters
-import scala.collection.JavaConverters._
 import org.apache.hadoop.fs.Path
 import org.apache.spark.sql.SparkSession
-import org.apache.spark.sql.catalyst.expressions.{Expression, ExprUtils}
-import org.apache.spark.sql.connector.read.PartitionReaderFactory
+import org.apache.spark.sql.catalyst.StructFilters
+import org.apache.spark.sql.catalyst.expressions.Expression
+import org.apache.spark.sql.catalyst.json.JSONOptionsInRead
 import org.apache.spark.sql.execution.datasources.PartitioningAwareFileIndex
-import org.apache.spark.sql.execution.datasources.v2.FileScan
+import org.apache.spark.sql.execution.datasources.v2.{FilePartitionReaderFactory, FileScan, FileScanBuilder}
 import org.apache.spark.sql.sources.Filter
 import org.apache.spark.sql.types.StructType
 import org.apache.spark.sql.util.CaseInsensitiveStringMap
 import org.apache.spark.util.SerializableConfiguration
-import org.apache.spark.sql.execution.datasources.v2.FileScanBuilder
-import org.apache.spark.sql.execution.datasources.v2.FilePartitionReaderFactory
-import org.apache.spark.sql.catalyst.json.JSONOptionsInRead
+
+import scala.collection.JavaConverters._
 
 //TODO: 特性支持: filter pushdown, columnPruning/schema问题/partition, split, corrupt, 自定义的options
 //copy from CSVScan/JsonScan

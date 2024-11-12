@@ -1,28 +1,15 @@
 package org.apache.spark.sql.execution.datasources.v2.wds
-import org.scalatest.FunSuite
+
 import org.apache.spark.sql.SparkSession
+import org.scalatest.funsuite.AnyFunSuite
 
-import java.io.{File, FileOutputStream}
-import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream
-import org.apache.commons.compress.archivers.tar.TarArchiveEntry
-import play.api.libs.json._
-import org.apache.commons.io.IOUtils
-import org.apache.hadoop.fs.Path
-import org.apache.commons.compress.archivers.tar.TarArchiveInputStream
+import java.io.{File, FileInputStream}
 
-import java.io.FileInputStream
-import org.apache.spark.sql.catalyst.json.{CreateJacksonParser, JSONOptions, JacksonParser, JsonInferSchema}
-import org.apache.spark.sql.catalyst.json.JSONOptionsInRead
-import com.fasterxml.jackson.core._
-import org.apache.spark.sql.Encoders
-
-class InferSchemaTest extends FunSuite {
+class InferSchemaTest extends AnyFunSuite {
   val spark = SparkSession.builder()
     .master("local")
     .getOrCreate()
   val sc = spark.sparkContext
-
-  import spark.implicits._
 
   test("read tar") {
     val project_root_dir = new File(getClass.getResource("/").getPath).getParentFile.getParentFile.getParentFile

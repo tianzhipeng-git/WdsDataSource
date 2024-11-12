@@ -2,33 +2,18 @@ package org.apache.spark.sql.execution.datasources.wds
 
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs.FileStatus
-import org.apache.hadoop.mapreduce.Job
+import org.apache.hadoop.mapreduce.{Job, TaskAttemptContext}
 import org.apache.spark.internal.Logging
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.catalyst.InternalRow
-import org.apache.spark.sql.execution.datasources.{
-  FileFormat,
-  OutputWriter,
-  OutputWriterFactory
-}
-import org.apache.spark.sql.sources.DataSourceRegister
-import org.apache.spark.sql.types.StructType
-import org.apache.hadoop.mapreduce.TaskAttemptContext
-import org.apache.spark.sql.execution.datasources.PartitionedFile
-import org.apache.spark.sql.sources.Filter
-import org.apache.spark.sql.util.CaseInsensitiveStringMap
-import scala.collection.JavaConverters._
-import org.apache.spark.sql.catalyst.util.CompressionCodecs
-import org.apache.spark.sql.execution.datasources.{
-  CodecStreams,
-  OutputWriter,
-  OutputWriterFactory
-}
-import org.apache.spark.sql.catalyst.json.{JSONOptions, JSONOptionsInRead}
-import org.apache.spark.sql.catalyst.util.CaseInsensitiveMap
-import org.apache.spark.sql.execution.datasources.v2.wds.{Utils, WdsOptions}
-import org.apache.spark.sql.execution.datasources.v2.wds.write.WdsOutputWriter
+import org.apache.spark.sql.catalyst.json.JSONOptionsInRead
+import org.apache.spark.sql.catalyst.util.{CaseInsensitiveMap, CompressionCodecs}
 import org.apache.spark.sql.execution.datasources.v2.wds.read.WdsPartitionReaderFactory
+import org.apache.spark.sql.execution.datasources.v2.wds.write.WdsOutputWriter
+import org.apache.spark.sql.execution.datasources.v2.wds.{Utils, WdsOptions}
+import org.apache.spark.sql.execution.datasources._
+import org.apache.spark.sql.sources.{DataSourceRegister, Filter}
+import org.apache.spark.sql.types.StructType
 import org.apache.spark.util.SerializableConfiguration
 
 class WdsFileFormat

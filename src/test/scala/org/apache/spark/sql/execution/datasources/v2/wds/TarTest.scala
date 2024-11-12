@@ -1,24 +1,13 @@
 package org.apache.spark.sql.execution.datasources.v2.wds
-import org.scalatest.FunSuite
-import org.apache.spark.sql.SparkSession
-
-import java.io.{File, FileOutputStream}
-import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream
-import org.apache.commons.compress.archivers.tar.TarArchiveEntry
-import play.api.libs.json._
-import org.apache.commons.io.IOUtils
-import org.apache.hadoop.fs.Path
-import org.apache.commons.compress.archivers.tar.TarArchiveInputStream
-
-import java.io.FileInputStream
-import org.apache.spark.sql.catalyst.json.{CreateJacksonParser, JSONOptions, JacksonParser, JsonInferSchema}
-import org.apache.spark.sql.catalyst.json.JSONOptionsInRead
-import com.fasterxml.jackson.core._
-
-import java.io.InputStream
+import org.apache.commons.compress.archivers.tar.{TarArchiveEntry, TarArchiveInputStream, TarArchiveOutputStream}
 import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream
+import org.apache.commons.io.IOUtils
+import org.scalatest.funsuite.AnyFunSuite
+import play.api.libs.json._
 
-class TarTest extends FunSuite {
+import java.io.{File, FileInputStream, FileOutputStream, InputStream}
+
+class TarTest extends AnyFunSuite {
   test("write tar") {
     val project_root_dir = new File(getClass.getResource("/").getPath).getParentFile.getParentFile.getParentFile
     println(s"project_root_dir: $project_root_dir")

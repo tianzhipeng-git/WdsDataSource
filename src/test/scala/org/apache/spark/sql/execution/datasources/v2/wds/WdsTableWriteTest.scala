@@ -1,26 +1,22 @@
 package org.apache.spark.sql.execution.datasources.v2.wds
 
-import org.scalatest.FunSuite
-import org.apache.spark.sql.execution.datasources.v2.wds.write.WdsOutputWriter
-import org.apache.spark.sql.catalyst.InternalRow
-import org.apache.spark.sql.types._
-import org.apache.spark.sql.catalyst.json.JSONOptions
+import org.apache.commons.compress.archivers.tar.TarArchiveInputStream
+import org.apache.commons.io.{FileUtils, IOUtils}
 import org.apache.hadoop.conf.Configuration
-import org.apache.hadoop.mapreduce.TaskAttemptContext
 import org.apache.hadoop.mapreduce.TaskAttemptID
 import org.apache.hadoop.mapreduce.task.TaskAttemptContextImpl
-import java.io.File
-import org.apache.commons.compress.archivers.tar.TarArchiveInputStream
-import org.apache.commons.io.IOUtils
-import java.io.FileInputStream
-import org.json4s.jackson.JsonMethods.parse
 import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.util.CaseInsensitiveMap
-import scala.io.Source
+import org.apache.spark.sql.execution.datasources.v2.wds.write.WdsOutputWriter
+import org.apache.spark.sql.types._
 import org.apache.spark.unsafe.types.UTF8String
-import org.apache.commons.io.FileUtils
+import org.json4s.jackson.JsonMethods.parse
+import org.scalatest.funsuite.AnyFunSuite
 
-class WdsOutputWriterTest extends FunSuite {
+import java.io.{File, FileInputStream}
+
+class WdsOutputWriterTest extends AnyFunSuite {
   val spark = SparkSession.builder()
     .master("local")
     .getOrCreate()

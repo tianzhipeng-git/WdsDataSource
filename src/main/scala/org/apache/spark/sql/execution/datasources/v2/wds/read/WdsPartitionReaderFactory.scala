@@ -1,32 +1,20 @@
 package org.apache.spark.sql.execution.datasources.v2.wds.read
+import org.apache.commons.compress.archivers.tar.TarArchiveInputStream
+import org.apache.commons.io.IOUtils
+import org.apache.hadoop.fs.Path
 import org.apache.spark.broadcast.Broadcast
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.expressions.GenericInternalRow
+import org.apache.spark.sql.catalyst.json.{JSONOptions, JacksonParser}
 import org.apache.spark.sql.connector.read.PartitionReader
 import org.apache.spark.sql.execution.datasources._
 import org.apache.spark.sql.execution.datasources.v2._
-
+import org.apache.spark.sql.execution.datasources.v2.wds.Utils
 import org.apache.spark.sql.internal.SQLConf
 import org.apache.spark.sql.sources.Filter
 import org.apache.spark.sql.types.StructType
-import org.apache.spark.util.SerializableConfiguration
-import org.apache.spark.sql.util.CaseInsensitiveStringMap
-import org.apache.hadoop.mapreduce.lib.input.LineRecordReader
-import org.apache.hadoop.fs.FileSystem
-import org.apache.hadoop.fs.Path
-import org.apache.spark.sql.catalyst.expressions.GenericRow
-import org.apache.spark.sql.catalyst.util.FailureSafeParser
-import org.apache.commons.compress.archivers.tar.TarArchiveInputStream
-import org.apache.commons.io.IOUtils
-import org.apache.commons.compress.archivers.tar.TarArchiveEntry
-import org.apache.spark.sql.catalyst.json.JSONOptionsInRead
-import org.apache.spark.sql.execution.datasources.v2.wds.{Using, Utils}
-import org.apache.spark.sql.catalyst.json.JacksonParser
-import scala.collection.JavaConverters._
-import org.apache.spark.sql.catalyst.json.CreateJacksonParser
-import com.fasterxml.jackson.core.JsonFactory
 import org.apache.spark.unsafe.types.UTF8String
-import org.apache.spark.sql.catalyst.json.JSONOptions
+import org.apache.spark.util.SerializableConfiguration
 
 case class WdsPartitionReaderFactory(
     sqlConf: SQLConf,
