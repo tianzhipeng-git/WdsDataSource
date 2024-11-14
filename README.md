@@ -37,6 +37,9 @@ cn:
 3. 其余类型的字段会写出到一个json文件中
 4. 需要在写出前自行控制分区, 控制每个分区数据量
 
+
+set spark.sql.jsonGenerator.ignoreNullFields=false to keep null fields in json
+
 # Unsupported Features & TODO
 - 支持内层json的gz压缩以及外层整体gz压缩
 - 支持filter pushdown
